@@ -81,6 +81,11 @@ class Constants {
             displayName: 'English',
         },
         {
+            code: 'ko',
+            name: 'korean',
+            displayName: '한국어',
+        },
+        {
             code: 'es',
             name: 'spanish',
             displayName: 'Español',

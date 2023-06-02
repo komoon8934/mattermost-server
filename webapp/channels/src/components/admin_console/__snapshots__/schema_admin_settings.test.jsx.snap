@@ -374,7 +374,7 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
                 },
                 Object {
                   "order": 17,
-                  "text": "한국어 (Alpha)",
+                  "text": "한국어",
                   "value": "ko",
                 },
                 Object {

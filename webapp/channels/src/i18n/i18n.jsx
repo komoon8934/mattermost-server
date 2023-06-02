@@ -133,7 +133,7 @@ const languages = {
     },
     ko: {
         value: 'ko',
-        name: '한국어 (Alpha)',
+        name: '한국어',
         order: 17,
         url: ko,
     },

@@ -15,7 +15,7 @@ const TopBar = (): JSX.Element => {
         <div
             className='TopBar'
         >
-            <a
+            {/* <a
                 className='link'
                 href={feedbackUrl}
                 target='_blank'
@@ -25,7 +25,7 @@ const TopBar = (): JSX.Element => {
                     id='TopBar.give-feedback'
                     defaultMessage='Give feedback'
                 />
-            </a>
+            </a> */}
             <div className='versionFrame'>
                 <div
                     className='version'

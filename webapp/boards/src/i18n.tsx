@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-
+import messages_ko from 'i18n/ko.json'
 import messages_ca from 'i18n/ca.json'
 import messages_de from 'i18n/de.json'
 import messages_el from 'i18n/el.json'
@@ -21,10 +21,12 @@ import messages_zhHant from 'i18n/zh_Hant.json'
 
 import {UserSettings} from './userSettings'
 
-const supportedLanguages = ['ca', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'nl', 'oc', 'pt-br', 'ru', 'sv', 'tr', 'zh-cn', 'zh-tw']
+const supportedLanguages = ['ko','ca', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'nl', 'oc', 'pt-br', 'ru', 'sv', 'tr', 'zh-cn', 'zh-tw']
 
 export function getMessages(lang: string): {[key: string]: string} {
     switch (lang) {
+    case 'ko':
+        return messages_ko
     case 'ca':
         return messages_ca
     case 'de':
@@ -58,7 +60,7 @@ export function getMessages(lang: string): {[key: string]: string} {
     case 'zh-tx':
         return messages_zhHans
     case 'zh-tw':
-        return messages_zhHans
+        return messages_zhHans    
     }
 
     return messages_en
