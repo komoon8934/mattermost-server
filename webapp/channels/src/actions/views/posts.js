@@ -14,6 +14,7 @@ import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 
 import * as Utils from 'utils/utils';
 import {getSiteURL} from 'utils/url';
+import {getPermalinkURL} from 'selectors/urls'; //Build 오류 회피를 위해 6/7일 추가
 import {containsAtChannel, groupsMentionedInText} from 'utils/post_utils';
 import {ActionTypes, AnnouncementBarTypes} from 'utils/constants';
 
@@ -40,7 +41,8 @@ export function forwardPost(post, channel, message = '') {
         const currentUserId = getCurrentUserId(state);
         const currentTeam = getCurrentTeam(state);
 
-        const relativePermaLink = Utils.getPermalinkURL(state, currentTeam.id, post.id);
+        //const relativePermaLink = Utils.getPermalinkURL(state, currentTeam.id, post.id); // 6/7 수정 원본
+        const relativePermaLink = getPermalinkURL(state, currentTeam.id, post.id); // 6/7 수정
         const permaLink = `${getSiteURL()}${relativePermaLink}`;
 
         const license = getLicense(state);

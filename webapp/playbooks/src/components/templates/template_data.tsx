@@ -61,7 +61,7 @@ export const PresetTemplates: PresetTemplate[] = preprocessTemplates([
         template: {
             ...emptyPlaybook(),
             title: 'Blank',
-            description: '이 플레이북에 대한 설명을 추가해서 플레이북을 언제 Run하는지, 용도는 무엇인지 개요를 추가하세요',
+            description: '이 플레이북에 대한 설명을 추가해서 플레이북을 언제 Run하는지, 용도는 무엇인지 알리세요.',
         },
     },
     {
@@ -337,8 +337,8 @@ export const PresetTemplates: PresetTemplate[] = preprocessTemplates([
         author: <MattermostLogo/>,
         template: {
             ...emptyPlaybook(),
-            title: '신입 직원 온보딩',
-            description: mtrim`신입 직원이 발생했습니까? 그렇면 조직 적응을 돕기 위한 프로세스를 나열하고 실행하세요.
+            title: '신입/전입 직원 온보딩',
+            description: mtrim`신입 또는 전입 직원이 있나요? 그렇다면 빠르고 완벽한 적응을 돕기 온보딩 프로세스를 수립하고 실행하세요.
 
             조직마다 고유한 온보딩 프로세스를 적용할 수 있습니다.`,
             checklists: [
@@ -348,9 +348,9 @@ export const PresetTemplates: PresetTemplate[] = preprocessTemplates([
                         newChecklistItem('자리 배정'),
                         newChecklistItem(
                             '온보딩 템플릿 수정을 미리 완료하세요',
-                            mtrim`관리자는 새로운 직원이 조직에서 빠르게 적용하고 역할을 수행할 수 있도록 명확한 기대치를 설정해야합니다. 온보딩 프로세스가 잘 준비되어 있다면 신규 멤버는 자신이 이 조직에서 환영받고 있으며 잘 적응할 수 있을것이라고 믿게 될 것입니다.
+                            mtrim`관리자는 새로운 직원이 조직에서 빠르게 적용하고 역할을 수행할 수 있도록 명확한 기대치를 설정해야합니다. 온보딩 프로세스가 잘 준비되어 있다면 신규 멤버 역시 조직과 관리자에 대한 믿음과 자신감을 바탕으로 빠르게 자기 능력을 발휘할 수 있을 것입니다.
                                 * **온보딩 목표:** 새 팀원이 처음 90일 동안 집중해야 하는 영역과 프로젝트를 명확히 합니다.                                 
-                                * **교육 계획 확인:** 부서 교육담당자에게 OJT 및 직무교육 일정을 확인합니다.                                 
+                                * **교육 계획 확인:** 부서 교육 담당자에게 OJT 및 직무교육 일정을 확인합니다.                                 
                                 * **온보딩 조력자 지정:** 온보딩 조력자는 팀, 섹션 혹은 TFT에서 조직과 프로젝트에 대한 질문의 답을 해줄 수 있는 개인 또는 그룹이어야 합니다. 관리자는 조력자를 지정하기 전에 대상자와 사전에 협의하고 동의를 얻어야 합니다.`,
                         ),
                     ],
@@ -443,6 +443,98 @@ export const PresetTemplates: PresetTemplate[] = preprocessTemplates([
                 },
                 {
                     title: 'Kickoff 및 수검',
+                    items: [
+                        newChecklistItem(
+                            '수검 당일 착수회의',
+                            mtrim`심사 및 점검 중점에 따라 수정:
+                            - 일정 계획
+                            - 대상 사업 설명`,                            
+                        ),
+                        newChecklistItem('사업별 인터뷰'),                        
+                    ],
+                },
+                {
+                    title: '결과 정리',
+                    items: [
+                        newChecklistItem('결과 정리, 부적합 사항 도출'),
+                        newChecklistItem('처리계획 요청'),                        
+                        newChecklistItem('결과 보고서 작성 및 품의'),                        
+                    ],
+                },
+                {
+                    title: 'Follow up',
+                    items: [
+                        newChecklistItem('부적합 조치결과 확인'),                        
+                    ],
+                },
+            ],
+            create_public_playbook_run: true,
+            channel_name_template: 'Audit: <name>',
+            message_on_join_enabled: true,
+            message_on_join:
+                mtrim`안녕하세요!
+
+                이 채널은 **심사 및 점검** 플레이북의 일부로 생성되어 관련 준비사항 및 수검 후속조치에 대한 커뮤니케이션을 목적으로 사용됩니다. 필요하다면 새 채널 멤버에게 전달할 메시지를 여기에 작성하세요. 메시지에는 마크다운 문법을 사용할 수 있습니다.`,
+            run_summary_template_enabled: true,
+            run_summary_template:
+                mtrim`**심사 요약**
+                나중에 참고할 수 있도록 금번 수검한 심사 개요와 경과에 대해 작성합니다.
+
+                **대상 사업**
+                - 사업명: 
+                
+                **심사 결과**
+                - 부적합건수 : 
+                - 최종 결과 : `,
+            reminder_message_template:
+                mtrim`### 심사 준비 현황
+                
+
+                ### 마지막 업데이트 후 진척사항
+                -
+
+                ### 리스크 및 이슈
+                - `,
+            reminder_timer_default_seconds: 24 * 60 * 60, // 1 day
+            retrospective_template:
+                mtrim`### 심사 준비
+                -
+
+                ### 진행 중 이슈
+                -
+
+                ### 향후 보완사항
+                - `,
+            retrospective_reminder_interval_seconds: 0, // Once
+        },
+    },
+    //6/7 연구개발 템플릿 추가 중
+    {
+        title: '연구개발 프로젝트 수행',
+        description: '연구개발 프로젝트 수행을 위한 플레이북입니다. 사업별로 적절하게 수정해서 사용할 수 있습니다.',
+        icon: <Handshake/>,
+        color: '#62697E14',
+        author: 'komoon@koreanair.com',
+        template: {
+            ...emptyPlaybook(),
+            title: '연구개발 프로젝트 수행',
+            description: '연구개발 프로젝트 수행을 위한 플레이북입니다. 사업별로 적절하게 수정해서 사용할 수 있습니다.',
+            checklists: [
+                {
+                    title: '실행계획 수립',
+                    items: [
+                        newChecklistItem('수행조직/인원별 업무분장 확인'),                        
+                        newChecklistItem('Master Schedule 작성'),
+                        newChecklistItem('투자 및 비용계획 작성'),
+                        newChecklistItem('자료 관리 계획 작성'),
+                        newChecklistItem('위험 및 이슈 관리계획 작성'),
+                        newChecklistItem('형상관리 계획 작성'),
+                        newChecklistItem('프로세스 테일러링'),
+                        newChecklistItem('실행계획서 종합 및 품의'),
+                    ],
+                },
+                {
+                    title: 'Kickoff',
                     items: [
                         newChecklistItem(
                             '수검 당일 착수회의',
@@ -708,7 +800,7 @@ export const PresetTemplates: PresetTemplate[] = preprocessTemplates([
                             '협업하고 싶은 팀 멤버를 초대해보세요.',
                         ),
                         newChecklistItem(
-                            '이 테스크를 Skip해보세요.',
+                            '이 Task를 Skip해보세요.',
                         ),
                         newChecklistItem(
                             'Run을 완료해보세요.',
