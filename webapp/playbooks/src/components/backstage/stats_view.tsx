@@ -38,9 +38,9 @@ const StatsView = (props: Props) => {
 
     if (!allowStatsView) {
         return (
-            <PlaceholderRow>
-                <UpgradePlaybookPlaceholder/>
-            </PlaceholderRow>
+            // <PlaceholderRow>
+            //     <UpgradePlaybookPlaceholder/>
+            // </PlaceholderRow>
         );
     }
 

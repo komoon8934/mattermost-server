@@ -55,9 +55,9 @@ const PlaybookKeyMetrics = ({
 
     if (!allowStatsView) {
         content = (
-            <PlaceholderRow>
-                <UpgradeKeyMetricsPlaceholder/>
-            </PlaceholderRow>
+            // <PlaceholderRow>
+            //     <UpgradeKeyMetricsPlaceholder/>
+            // </PlaceholderRow>
         );
     } else if (playbookMetrics.length === 0) {
         content = <NoMetricsPlaceholder/>;

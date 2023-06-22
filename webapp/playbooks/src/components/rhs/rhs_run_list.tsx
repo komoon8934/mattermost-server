@@ -237,9 +237,11 @@ const RHSRunList = (props: Props) => {
                                 <StyledLoadingSpinner/>
                             }
                         </RunsList>
+                        {/* 2023-06-22 commented by komoon
                         <FeedbackWrapper>
                             <StyledGiveFeedbackButton tooltipPlacement='top'/>
-                        </FeedbackWrapper>
+                        </FeedbackWrapper> 
+                        */}
                     </Scrollbars>
                 }
             </Container>
