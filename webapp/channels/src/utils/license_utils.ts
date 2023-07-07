@@ -88,13 +88,15 @@ export function isEnterpriseOrE20License(license: ClientLicense) {
 }
 
 export const isEnterpriseLicense = (license?: ClientLicense) => {
-    switch (license?.SkuShortName) {
-    case LicenseSkus.Enterprise:
-    case LicenseSkus.E20:
-        return true;
-    }
+    //수정됨-E20라이선스 체크
+    // switch (license?.SkuShortName) {
+    // case LicenseSkus.Enterprise:
+    // case LicenseSkus.E20:
+    //     return true;
+    // }
 
-    return false;
+    // return false;
+    return true;
 };
 
 export const isNonEnterpriseLicense = (license?: ClientLicense) => !isEnterpriseLicense(license);

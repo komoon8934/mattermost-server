@@ -66,9 +66,10 @@ func (r *ExecutionRequest) CanBeExecuted(p PermissionSet) *model.AppError {
 				return model.NewAppError("WorkTemplateExecutionRequest.CanBeExecuted", "app.worktemplate.execution_request.cannot_create_private_playbook", nil, "", http.StatusForbidden)
 			}
 			// private playbook is an E20/Enterprise feature
-			if !public && (p.License == nil || (p.License.SkuShortName != model.LicenseShortSkuE20 && p.License.SkuShortName != model.LicenseShortSkuEnterprise)) {
-				return model.NewAppError("WorkTemplateExecutionRequest.CanBeExecuted", "app.worktemplate.execution_request.license_cannot_create_private_playbook", nil, "", http.StatusForbidden)
-			}
+			// 수정됨-플레이북 라이선스 체크
+			// if !public && (p.License == nil || (p.License.SkuShortName != model.LicenseShortSkuE20 && p.License.SkuShortName != model.LicenseShortSkuEnterprise)) {
+			// 	return model.NewAppError("WorkTemplateExecutionRequest.CanBeExecuted", "app.worktemplate.execution_request.license_cannot_create_private_playbook", nil, "", http.StatusForbidden)
+			// }
 			continue
 		}
 
