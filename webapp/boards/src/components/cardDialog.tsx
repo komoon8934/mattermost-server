@@ -121,6 +121,7 @@ const CardDialog = (props: Props): JSX.Element => {
     }
 
     const menu = (
+        //수정됨-23.7.7 보드 템플릿 모달 윈도우 메시지 한글화
         <CardActionsMenu
             cardId={props.cardId}
             boardId={board.id}
@@ -134,7 +135,7 @@ const CardDialog = (props: Props): JSX.Element => {
                         <CompassIcon
                             icon='plus'
                         />}
-                    name='New template from card'
+                    name='템플릿 수정'
                     onClick={makeTemplateClicked}
                 />
             </BoardPermissionGate>

@@ -140,7 +140,7 @@ const Customize = ({
         </div>
     );
 };
-
+// 수정됨-23.7.7 Tour 모달 윈도우 입력창 폰트 컬러 수정
 const StyledCustomized = styled(Customize)`
     display: flex;
     flex-direction: column;
@@ -172,6 +172,9 @@ const StyledCustomized = styled(Customize)`
 
     .name-section-container {
         margin-top: 33px;
+        input {
+            color: #696969;
+        }
     }
 
     .visibility-section-container {
