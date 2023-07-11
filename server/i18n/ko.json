@@ -2409,7 +2409,7 @@
 	},
 	{
 		"id": "api.post.send_notifications_and_forget.push_explicit_mention",
-		"translation": " 당신을 언급했습니다."
+		"translation": " 나를 언급했습니다."
 	},
 	{
 		"id": "api.post.send_notifications_and_forget.push_general_message",
@@ -5829,11 +5829,11 @@
 	},
 	{
 		"id": "app.notification.body.mention.subTitle",
-		"translation": "자리를 비운 동안 {{.SenderName}}이(가) {{.ChannelName}} 채널에서 당신을 언급했습니다."
+		"translation": "자리를 비운 동안 {{.SenderName}}이(가) {{.ChannelName}} 채널에서 나를 언급했습니다."
 	},
 	{
 		"id": "app.notification.body.mention.title",
-		"translation": "{{.SenderName}}이(가) 메시지에서 당신을 언급했습니다."
+		"translation": "{{.SenderName}}이(가) 메시지에서 나를 언급했습니다."
 	},
 	{
 		"id": "app.notification.body.thread.title",
@@ -10097,11 +10097,11 @@
 	},
 	{
 		"id": "worktemplate.design.content_calendar.board",
-		"translation": "콘텐츠 캘린더 보드를 사용해서 아이디어를 추적하고, 콘텐츠 테마 계획 및 제작 프로세스 관리하며 마일스톤을 설정할 수 있습니다."
+		"translation": "컨텐츠 캘린더 보드를 사용해서 아이디어를 추적하고, 컨텐츠 테마 계획 및 제작 프로세스 관리하며 마일스톤을 설정할 수 있습니다."
 	},
 	{
 		"id": "worktemplate.design.content_calendar.channel",
-		"translation": "전용 채널에서 콘텐츠 아이디어, 인기 게시물, 블로그 링크 및 멘션을 공유하세요."
+		"translation": "전용 채널에서 컨텐츠 아이디어, 인기 게시물, 블로그 링크 및 멘션을 공유하세요."
 	},
 	{
 		"id": "worktemplate.design.create_project.board",
@@ -10281,11 +10281,11 @@
 	},
 	{
 		"id": "worktemplate.leadership.content_calendar.board",
-		"translation": "콘텐츠 캘린더 보드를 사용하여 아이디어를 추적하고 콘텐츠 테마 계획 및 제작 프로세스를 관리하고 마일스톤을 설정하세요."
+		"translation": "컨텐츠 캘린더 보드를 사용하여 아이디어를 추적하고 컨텐츠 테마 계획 및 제작 프로세스를 관리하고 마일스톤을 설정하세요."
 	},
 	{
 		"id": "worktemplate.leadership.content_calendar.channel",
-		"translation": "전용 채널에서 콘텐츠 아이디어, 인기 게시물, 블로그 링크 및 멘션을 공유하세요."
+		"translation": "전용 채널에서 컨텐츠 아이디어, 인기 게시물, 블로그 링크 및 멘션을 공유하세요."
 	},
 	{
 		"id": "worktemplate.leadership.create_project.board",
@@ -10325,11 +10325,11 @@
 	},
 	{
 		"id": "worktemplate.marketing.content_calendar.board",
-		"translation": "콘텐츠 캘린더 보드를 사용하여 아이디어를 추적하고 콘텐츠 테마 계획 및 제작 프로세스를 관리하고 마일스톤을 설정하세요."
+		"translation": "컨텐츠 캘린더 보드를 사용하여 아이디어를 추적하고 컨텐츠 테마 계획 및 제작 프로세스를 관리하고 마일스톤을 설정하세요."
 	},
 	{
 		"id": "worktemplate.marketing.content_calendar.channel",
-		"translation": "전용 채널에서 콘텐츠 아이디어, 인기 게시물, 블로그 링크 및 멘션을 공유하세요."
+		"translation": "전용 채널에서 컨텐츠 아이디어, 인기 게시물, 블로그 링크 및 멘션을 공유하세요."
 	},
 	{
 		"id": "worktemplate.marketing.create_project.board",

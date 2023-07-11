@@ -206,9 +206,10 @@ const RHSRunList = (props: Props) => {
                                 onStartRunClicked={handleStartRun}
                             />
                         </NoRunsWrapper>
+                        {/* 수정됨-피드백 버튼 제거, 2023.7.11
                         <FeedbackWrapper>
                             <StyledGiveFeedbackButton tooltipPlacement='top'/>
-                        </FeedbackWrapper>
+                        </FeedbackWrapper> */}
                     </>
                 }
                 {!showNoRuns &&
@@ -237,9 +238,10 @@ const RHSRunList = (props: Props) => {
                                 <StyledLoadingSpinner/>
                             }
                         </RunsList>
+                        {/* 수정됨-피드백 버튼 제거, 2023.7.11
                         <FeedbackWrapper>
                             <StyledGiveFeedbackButton tooltipPlacement='top'/>
-                        </FeedbackWrapper>
+                        </FeedbackWrapper> */}
                     </Scrollbars>
                 }
             </Container>

@@ -14,10 +14,11 @@ import (
 	"github.com/mattermost/mattermost-server/server/v8/platform/shared/mlog"
 )
 
+// 수정됨-서버 메시지 한글화, 23.7.10
 const (
 	botUsername    = "boards"
 	botDisplayname = "Boards"
-	botDescription = "Created by Boards plugin."
+	botDescription = "보드 플러그인에 의해 생성되었습니다."
 )
 
 func GetDefaultFocalboardBot() *mm_model.Bot {

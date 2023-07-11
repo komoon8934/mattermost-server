@@ -21,9 +21,10 @@ import (
 
 const (
 	// card change notifications.
-	defAddCardNotify    = "{{.Authors | printAuthors \"unknown_user\" }} has added the card {{. | makeLink}}\n"
-	defModifyCardNotify = "###### {{.Authors | printAuthors \"unknown_user\" }} has modified the card {{. | makeLink}} on the board {{. | makeBoardLink}}\n"
-	defDeleteCardNotify = "{{.Authors | printAuthors \"unknown_user\" }} has deleted the card {{. | makeLink}}\n"
+	//수정됨-서버 문자열 한글화, 2023.7.10
+	defAddCardNotify    = "{{.Authors | printAuthors \"unknown_user\" }}이(가) {{. | makeLink}} 카드를 추가했습니다.\n"
+	defModifyCardNotify = "###### {{.Authors | printAuthors \"unknown_user\" }}이(가) {{. | makeBoardLink}}보드의 {{. | makeLink}} 카드를 수정했습니다.\n"
+	defDeleteCardNotify = "{{.Authors | printAuthors \"unknown_user\" }}이(가)  {{. | makeLink}} 카드를 삭제했습니다.\n"
 )
 
 var (

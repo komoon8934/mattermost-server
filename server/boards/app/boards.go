@@ -14,14 +14,15 @@ import (
 	"github.com/mattermost/mattermost-server/server/v8/platform/shared/mlog"
 )
 
+// 수정됨-서버 메시지 한글화, 2023.7.10
 var (
-	ErrNewBoardCannotHaveID = errors.New("new board cannot have an ID")
+	ErrNewBoardCannotHaveID = errors.New("새 보드는 ID를 가질 수 없습니다")
 )
 
-const linkBoardMessage = "@%s linked the board [%s](%s) with this channel"
-const unlinkBoardMessage = "@%s unlinked the board [%s](%s) with this channel"
+const linkBoardMessage = "@%s이(가) [%s](%s) 보드를 이 채널에 연결했습니다"
+const unlinkBoardMessage = "@%s이(가) [%s](%s) 보드를 이 채널에서 연결해제했습니다"
 
-var errNoDefaultCategoryFound = errors.New("no default category found for user")
+var errNoDefaultCategoryFound = errors.New("사용자에 대한 기본 카테고리를 찾을 수 없습니다.")
 
 func (a *App) GetBoard(boardID string) (*model.Board, error) {
 	board, err := a.store.GetBoard(boardID)
@@ -77,12 +78,12 @@ func (a *App) GetBoardMetadata(boardID string) (*model.Board, *model.BoardMetada
 func (a *App) getBoardForBlock(blockID string) (*model.Board, error) {
 	block, err := a.GetBlockByID(blockID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get block %s: %w", blockID, err)
+		return nil, fmt.Errorf("%s 블럭을 가져올 수 없습니다: %w", blockID, err)
 	}
 
 	board, err := a.GetBoard(block.BoardID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get board %s: %w", block.BoardID, err)
+		return nil, fmt.Errorf("%s 보드를 가져올 수 없습니다: %w", block.BoardID, err)
 	}
 
 	return board, nil
@@ -95,7 +96,7 @@ func (a *App) getBoardHistory(boardID string, latest bool) (*model.Board, error)
 	}
 	boards, err := a.store.GetBoardHistory(boardID, opts)
 	if err != nil {
-		return nil, fmt.Errorf("could not get history for board: %w", err)
+		return nil, fmt.Errorf("보드 히스토리를 가져올 수 없습니다: %w", err)
 	}
 	if len(boards) == 0 {
 		return nil, nil
@@ -110,7 +111,7 @@ func (a *App) getBoardDescendantModifiedInfo(boardID string, latest bool) (int64
 		return 0, "", err
 	}
 	if board == nil {
-		return 0, "", fmt.Errorf("history not found for board: %w", err)
+		return 0, "", fmt.Errorf("보드 히스토리를 찾을 수 없습니다: %w", err)
 	}
 
 	var timestamp int64
@@ -128,7 +129,7 @@ func (a *App) getBoardDescendantModifiedInfo(boardID string, latest bool) (int64
 	}
 	blocks, err := a.store.GetBlockHistoryDescendants(boardID, opts)
 	if err != nil {
-		return 0, "", fmt.Errorf("could not get blocks history descendants for board: %w", err)
+		return 0, "", fmt.Errorf("보드의 블럭 히스토리 내역을 가져올 수 없습니다: %w", err)
 	}
 	if len(blocks) > 0 {
 		// Compare the board history info with the descendant block info, if it exists
@@ -188,9 +189,9 @@ func (a *App) DuplicateBoard(boardID, userID, toTeam string, asTemplate bool) (*
 	if err != nil {
 		dbab := model.NewDeleteBoardsAndBlocksFromBabs(bab)
 		if err = a.store.DeleteBoardsAndBlocks(dbab, userID); err != nil {
-			a.logger.Error("Cannot delete board after duplication error when updating block's file info", mlog.String("boardID", bab.Boards[0].ID), mlog.Err(err))
+			a.logger.Error("블럭 파일 정보 업데이트 시 복제 오류 후 보드를 삭제할 수 없습니다", mlog.String("boardID", bab.Boards[0].ID), mlog.Err(err))
 		}
-		return nil, nil, fmt.Errorf("could not patch file IDs while duplicating board %s: %w", boardID, err)
+		return nil, nil, fmt.Errorf("%s 보드 복제 중 파일 ID를 패치할 수 없습니다: %w", boardID, err)
 	}
 
 	if !asTemplate {
@@ -222,7 +223,7 @@ func (a *App) DuplicateBoard(boardID, userID, toTeam string, asTemplate bool) (*
 		go func() {
 			if uErr := a.UpdateCardLimitTimestamp(); uErr != nil {
 				a.logger.Error(
-					"UpdateCardLimitTimestamp failed after duplicating a board",
+					"보드 복제 후 UpdateCardLimitTimestamp 실패했습니다",
 					mlog.Err(uErr),
 				)
 			}
@@ -265,7 +266,7 @@ func (a *App) CreateBoard(board *model.Board, userID string, addMember bool) (*m
 		if newBoard.ChannelID != "" {
 			members, err := a.GetMembersForBoard(board.ID)
 			if err != nil {
-				a.logger.Error("Unable to get the board members", mlog.Err(err))
+				a.logger.Error("보드 멤버를 가져올 수 없습니다", mlog.Err(err))
 			}
 			for _, member := range members {
 				a.wsAdapter.BroadcastMemberChange(newBoard.TeamID, member.BoardID, member)
@@ -326,7 +327,7 @@ func (a *App) PatchBoard(patch *model.BoardPatch, boardID, userID string) (*mode
 			var err error
 			oldMembers, err = a.GetMembersForBoard(boardID)
 			if err != nil {
-				a.logger.Error("Unable to get the board members", mlog.Err(err))
+				a.logger.Error("보드 멤버를 가져올 수 없습니다", mlog.Err(err))
 			}
 		} else if patch.ChannelID != nil && *patch.ChannelID != "" {
 			testChannel = *patch.ChannelID
@@ -347,7 +348,7 @@ func (a *App) PatchBoard(patch *model.BoardPatch, boardID, userID string) (*mode
 
 		if testChannel != "" {
 			if !a.permissions.HasPermissionToChannel(userID, testChannel, model.PermissionCreatePost) {
-				return nil, model.NewErrPermission("access denied to channel")
+				return nil, model.NewErrPermission("채널 액세스가 거부되었습니다")
 			}
 		}
 	}
@@ -362,7 +363,7 @@ func (a *App) PatchBoard(patch *model.BoardPatch, boardID, userID string) (*mode
 
 		user, err := a.store.GetUserByID(userID)
 		if err != nil {
-			a.logger.Error("Unable to get the board updater", mlog.Err(err))
+			a.logger.Error("보드 업데이터를 사용할 수 없습니다", mlog.Err(err))
 			username = "unknown"
 		} else {
 			username = user.Username
@@ -388,7 +389,7 @@ func (a *App) PatchBoard(patch *model.BoardPatch, boardID, userID string) (*mode
 			if *patch.ChannelID != "" {
 				members, err := a.GetMembersForBoard(updatedBoard.ID)
 				if err != nil {
-					a.logger.Error("Unable to get the board members", mlog.Err(err))
+					a.logger.Error("보드 멤버를 가져올 수 없습니다", mlog.Err(err))
 				}
 				for _, member := range members {
 					if member.Synthetic {
@@ -407,7 +408,7 @@ func (a *App) PatchBoard(patch *model.BoardPatch, boardID, userID string) (*mode
 		if patch.Type != nil && isTemplate {
 			members, err := a.GetMembersForBoard(updatedBoard.ID)
 			if err != nil {
-				a.logger.Error("Unable to get the board members", mlog.Err(err))
+				a.logger.Error("보드 멤버를 가져올 수 없습니다", mlog.Err(err))
 			}
 			a.broadcastTeamUsers(updatedBoard.TeamID, updatedBoard.ID, *patch.Type, members)
 		}
@@ -420,7 +421,7 @@ func (a *App) PatchBoard(patch *model.BoardPatch, boardID, userID string) (*mode
 func (a *App) postChannelMessage(message, channelID string) {
 	err := a.store.PostMessage(message, "", channelID)
 	if err != nil {
-		a.logger.Error("Unable to post the link message to channel", mlog.Err(err))
+		a.logger.Error("채널에 링크 메시지를 게시할 수 없습니다", mlog.Err(err))
 	}
 }
 
@@ -429,7 +430,7 @@ func (a *App) postChannelMessage(message, channelID string) {
 func (a *App) broadcastTeamUsers(teamID, boardID string, boardType model.BoardType, members []*model.BoardMember) {
 	users, err := a.GetTeamUsers(teamID, "")
 	if err != nil {
-		a.logger.Error("Unable to get the team users", mlog.Err(err))
+		a.logger.Error("팀 사용자를 가져올 수 없습니다", mlog.Err(err))
 	}
 	for _, user := range users {
 		isMember := false
@@ -470,7 +471,7 @@ func (a *App) DeleteBoard(boardID, userID string) error {
 	go func() {
 		if err := a.UpdateCardLimitTimestamp(); err != nil {
 			a.logger.Error(
-				"UpdateCardLimitTimestamp failed after deleting a board",
+				"보드 삭제 후 UpdateCardLimitTimestamp에 실패했습니다",
 				mlog.Err(err),
 			)
 		}
@@ -704,7 +705,7 @@ func (a *App) UndeleteBoard(boardID string, modifiedBy string) error {
 	}
 
 	if board == nil {
-		a.logger.Error("Error loading the board after undelete, not propagating through websockets or notifications")
+		a.logger.Error("삭제 취소 후 보드 불러오기 오류, 웹소켓 또는 알림을 통해 전파되지 않았습니다")
 		return nil
 	}
 
@@ -716,7 +717,7 @@ func (a *App) UndeleteBoard(boardID string, modifiedBy string) error {
 	go func() {
 		if err := a.UpdateCardLimitTimestamp(); err != nil {
 			a.logger.Error(
-				"UpdateCardLimitTimestamp failed after undeleting a board",
+				"보드 삭제 취소 후 UpdateCardLimitTimestamp에 실패했습니다",
 				mlog.Err(err),
 			)
 		}
