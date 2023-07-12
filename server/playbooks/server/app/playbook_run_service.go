@@ -1392,11 +1392,11 @@ func (s *PlaybookRunServiceImpl) ChangeOwner(playbookRunID, userID, ownerID stri
 
 	// Do we send a DM to the new owner?
 	if ownerID != userID {
-		msg := fmt.Sprintf("@%s changed the owner for run: [%s](%s) from **@%s** to **@%s**",
+		msg := fmt.Sprintf("@%s이(가) Run 오너를 변경했습니다: [%s](%s) from **@%s** to **@%s**",
 			subjectUser.Username, playbookRunToModify.Name, GetRunDetailsRelativeURL(playbookRunToModify.ID),
 			oldOwner.Username, newOwner.Username)
 		if err = s.poster.DM(ownerID, &model.Post{Message: msg}); err != nil {
-			return errors.Wrapf(err, "failed to send DM in ChangeOwner")
+			return errors.Wrapf(err, "변경된 오너에게 DM 발송이 실패했습니다")
 		}
 	}
 
@@ -1434,7 +1434,7 @@ func (s *PlaybookRunServiceImpl) ModifyCheckedState(playbookRunID, userID, newSt
 	}
 
 	if !IsValidChecklistItemIndex(playbookRunToModify.Checklists, checklistNumber, itemNumber) {
-		return errors.New("invalid checklist item indicies")
+		return errors.New("유효하지 않은 체크리스트 항목은 다음과 같습니다")
 	}
 
 	itemToCheck := playbookRunToModify.Checklists[checklistNumber].Items[itemNumber]
@@ -1447,18 +1447,18 @@ func (s *PlaybookRunServiceImpl) ModifyCheckedState(playbookRunID, userID, newSt
 		Task:   stripmd.Strip(itemToCheck.Title),
 	}
 
-	modifyMessage := fmt.Sprintf("checked off checklist item **%v**", stripmd.Strip(itemToCheck.Title))
+	modifyMessage := fmt.Sprintf("체크리스트 항목 **%v**에 완료 표시 ", stripmd.Strip(itemToCheck.Title))
 	if newState == ChecklistItemStateOpen {
 		details.Action = "uncheck"
-		modifyMessage = fmt.Sprintf("unchecked checklist item **%v**", stripmd.Strip(itemToCheck.Title))
+		modifyMessage = fmt.Sprintf("체크리스트 항목 **%v** 체크 해제", stripmd.Strip(itemToCheck.Title))
 	}
 	if newState == ChecklistItemStateSkipped {
 		details.Action = "skip"
-		modifyMessage = fmt.Sprintf("skipped checklist item **%v**", stripmd.Strip(itemToCheck.Title))
+		modifyMessage = fmt.Sprintf("체크리스트 항목 **%v** 건너뜀", stripmd.Strip(itemToCheck.Title))
 	}
 	if itemToCheck.State == ChecklistItemStateSkipped && newState == ChecklistItemStateOpen {
 		details.Action = "restore"
-		modifyMessage = fmt.Sprintf("restored checklist item **%v**", stripmd.Strip(itemToCheck.Title))
+		modifyMessage = fmt.Sprintf("체크리스트 항목 **%v** 복원됨", stripmd.Strip(itemToCheck.Title))
 	}
 
 	itemToCheck.State = newState
@@ -1467,14 +1467,14 @@ func (s *PlaybookRunServiceImpl) ModifyCheckedState(playbookRunID, userID, newSt
 
 	playbookRunToModify, err = s.store.UpdatePlaybookRun(playbookRunToModify)
 	if err != nil {
-		return errors.Wrapf(err, "failed to update playbook run, is now in inconsistent state")
+		return errors.Wrapf(err, "플레이북 Run 업데이트 실패, 현재 일관성 없는 상태입니다")
 	}
 
 	s.telemetry.ModifyCheckedState(playbookRunID, userID, itemToCheck, playbookRunToModify.OwnerUserID == userID)
 
 	detailsJSON, err := json.Marshal(details)
 	if err != nil {
-		return errors.Wrap(err, "failed to encode timeline event details")
+		return errors.Wrap(err, "타임라인 이벤트 상세사항을 인코딩하지 못했습니다")
 	}
 
 	event := &TimelineEvent{
@@ -1503,7 +1503,7 @@ func (s *PlaybookRunServiceImpl) ToggleCheckedState(playbookRunID, userID string
 	}
 
 	if !IsValidChecklistItemIndex(playbookRunToModify.Checklists, checklistNumber, itemNumber) {
-		return errors.New("invalid checklist item indices")
+		return errors.New("유효하지 않은 체크리스트 항목 인덱스")
 	}
 
 	isOpen := playbookRunToModify.Checklists[checklistNumber].Items[itemNumber].State == ChecklistItemStateOpen
@@ -1524,7 +1524,7 @@ func (s *PlaybookRunServiceImpl) SetAssignee(playbookRunID, userID, assigneeID s
 	}
 
 	if !IsValidChecklistItemIndex(playbookRunToModify.Checklists, checklistNumber, itemNumber) {
-		return errors.New("invalid checklist item indices")
+		return errors.New("유효하지 않은 체크리스트 항목 인덱스")
 	}
 
 	itemToCheck := playbookRunToModify.Checklists[checklistNumber].Items[itemNumber]
@@ -1558,7 +1558,7 @@ func (s *PlaybookRunServiceImpl) SetAssignee(playbookRunID, userID, assigneeID s
 
 	playbookRunToModify, err = s.store.UpdatePlaybookRun(playbookRunToModify)
 	if err != nil {
-		return errors.Wrapf(err, "failed to update playbook run; it is now in an inconsistent state")
+		return errors.Wrapf(err, "플레이북 Run 업데이트 실패, 현재 일관성 없는 상태입니다")
 	}
 
 	// add the user as run participant if they was not already
@@ -1573,7 +1573,7 @@ func (s *PlaybookRunServiceImpl) SetAssignee(playbookRunID, userID, assigneeID s
 		if !isParticipant {
 			err = s.AddParticipants(playbookRunID, []string{assigneeID}, userID, false)
 			if err != nil {
-				return errors.Wrapf(err, "failed to add assignee to run")
+				return errors.Wrapf(err, "Run 담당자 추가에 실패했습니다")
 			}
 		}
 	}
@@ -1587,17 +1587,17 @@ func (s *PlaybookRunServiceImpl) SetAssignee(playbookRunID, userID, assigneeID s
 		}
 
 		runURL := fmt.Sprintf("[%s](%s?from=dm_assignedtask)\n", playbookRunToModify.Name, GetRunDetailsRelativeURL(playbookRunID))
-		modifyMessage := fmt.Sprintf("@%s assigned you the task **%s** (previously assigned to %s) for the run: %s   #taskassigned",
+		modifyMessage := fmt.Sprintf("@%s이(가) 나에게 task **%s**을(를) 할당했습니다. (이전에 %s에 할당) Run: %s   #taskassigned",
 			subjectUser.Username, stripmd.Strip(itemToCheck.Title), oldAssigneeUserAtMention, runURL)
 
 		if err = s.poster.DM(itemToCheck.AssigneeID, &model.Post{Message: modifyMessage}); err != nil {
-			return errors.Wrapf(err, "failed to send DM in SetAssignee")
+			return errors.Wrapf(err, "SetAssignee에서 DM을 보내지 못했습니다.")
 		}
 	}
 
 	s.telemetry.SetAssignee(playbookRunID, userID, itemToCheck)
 
-	modifyMessage := fmt.Sprintf("changed assignee of checklist item **%s** from **%s** to **%s**",
+	modifyMessage := fmt.Sprintf("체크리스트 항목**%s** 담당자를 **%s**에서 **%s**(으)로 변경했습니다",
 		stripmd.Strip(itemToCheck.Title), oldAssigneeUserAtMention, newAssigneeUserAtMention)
 	event := &TimelineEvent{
 		PlaybookRunID: playbookRunID,
@@ -1625,7 +1625,7 @@ func (s *PlaybookRunServiceImpl) SetCommandToChecklistItem(playbookRunID, userID
 	}
 
 	if !IsValidChecklistItemIndex(playbookRunToModify.Checklists, checklistNumber, itemNumber) {
-		return errors.New("invalid checklist item indices")
+		return errors.New("유효하지 않은 체크리스트 항목 인덱스")
 	}
 
 	// CommandLastRun is reset to avoid misunderstandings when the command is changed but the date
@@ -1652,7 +1652,7 @@ func (s *PlaybookRunServiceImpl) SetTaskActionsToChecklistItem(playbookRunID, us
 	}
 
 	if !IsValidChecklistItemIndex(playbookRunToModify.Checklists, checklistNumber, itemNumber) {
-		return errors.New("invalid checklist item indices")
+		return errors.New("유효하지 않은 체크리스트 항목 인덱스")
 	}
 
 	playbookRunToModify.Checklists[checklistNumber].Items[itemNumber].TaskActions = taskActions
@@ -1674,7 +1674,7 @@ func (s *PlaybookRunServiceImpl) SetDueDate(playbookRunID, userID string, duedat
 	}
 
 	if !IsValidChecklistItemIndex(playbookRunToModify.Checklists, checklistNumber, itemNumber) {
-		return errors.New("invalid checklist item indices")
+		return errors.New("유효하지 않은 체크리스트 항목 인덱스")
 	}
 
 	itemToCheck := playbookRunToModify.Checklists[checklistNumber].Items[itemNumber]
@@ -1683,7 +1683,7 @@ func (s *PlaybookRunServiceImpl) SetDueDate(playbookRunID, userID string, duedat
 
 	_, err = s.store.UpdatePlaybookRun(playbookRunToModify)
 	if err != nil {
-		return errors.Wrapf(err, "failed to update playbook run; it is now in an inconsistent state")
+		return errors.Wrapf(err, "플레이북 Run 업데이트 실패, 현재 일관성 없는 상태입니다")
 	}
 	s.sendPlaybookRunUpdatedWS(playbookRunID)
 
@@ -1699,12 +1699,12 @@ func (s *PlaybookRunServiceImpl) RunChecklistItemSlashCommand(playbookRunID, use
 	}
 
 	if !IsValidChecklistItemIndex(playbookRun.Checklists, checklistNumber, itemNumber) {
-		return "", errors.New("invalid checklist item indices")
+		return "", errors.New("유효하지 않은 체크리스트 항목 인덱스")
 	}
 
 	itemToRun := playbookRun.Checklists[checklistNumber].Items[itemNumber]
 	if strings.TrimSpace(itemToRun.Command) == "" {
-		return "", errors.New("no slash command associated with this checklist item")
+		return "", errors.New("이 체크리스트 항목에 연결된 슬래시 커맨드가 없습니다")
 	}
 
 	// parse playbook summary for variables and values
@@ -1716,8 +1716,8 @@ func (s *PlaybookRunServiceImpl) RunChecklistItemSlashCommand(playbookRunID, use
 	command := itemToRun.Command
 	for _, v := range varsInCmd {
 		if val, ok := varsAndVals[v]; !ok || val == "" {
-			s.poster.EphemeralPost(userID, playbookRun.ChannelID, &model.Post{Message: fmt.Sprintf("Found undefined or empty variable in slash command: %s", v)})
-			return "", errors.Errorf("Found undefined or empty variable in slash command: %s", v)
+			s.poster.EphemeralPost(userID, playbookRun.ChannelID, &model.Post{Message: fmt.Sprintf("다음 슬래시 커맨드에서 정의되지 않았거나 빈 변수가 있습니다: %s", v)})
+			return "", errors.Errorf("다음 슬래시 커맨드에서 정의되지 않았거나 빈 변수가 있습니다: %s", v)
 		}
 		command = strings.ReplaceAll(command, v, varsAndVals[v])
 	}
@@ -1730,20 +1730,20 @@ func (s *PlaybookRunServiceImpl) RunChecklistItemSlashCommand(playbookRunID, use
 	})
 	if err == ErrNotFound {
 		trigger := strings.Fields(command)[0]
-		s.poster.EphemeralPost(userID, playbookRun.ChannelID, &model.Post{Message: fmt.Sprintf("Failed to find slash command **%s**", trigger)})
+		s.poster.EphemeralPost(userID, playbookRun.ChannelID, &model.Post{Message: fmt.Sprintf("슬래시 커맨드를 찾을 수 없습니다 **%s**", trigger)})
 
-		return "", errors.Wrap(err, "failed to find slash command")
+		return "", errors.Wrap(err, "슬래시 커맨드를 찾을 수 없습니다")
 	} else if err != nil {
-		s.poster.EphemeralPost(userID, playbookRun.ChannelID, &model.Post{Message: fmt.Sprintf("Failed to execute slash command **%s**", command)})
+		s.poster.EphemeralPost(userID, playbookRun.ChannelID, &model.Post{Message: fmt.Sprintf("슬래시 커맨드를 실행할 수 없습니다 **%s**", command)})
 
-		return "", errors.Wrap(err, "failed to run slash command")
+		return "", errors.Wrap(err, "슬래시 커맨드를 실행할 수 없습니다")
 	}
 
 	// Fetch the playbook run again, in case the slash command actually changed the run
 	// (e.g. `/playbook owner`).
 	playbookRun, err = s.store.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to retrieve playbook run after running slash command")
+		return "", errors.Wrapf(err, "슬래시 커맨드 실행 후 플레이북 Run을 찾지 못했습니다")
 	}
 
 	// Record the last (successful) run time.
@@ -1751,7 +1751,7 @@ func (s *PlaybookRunServiceImpl) RunChecklistItemSlashCommand(playbookRunID, use
 
 	_, err = s.store.UpdatePlaybookRun(playbookRun)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to update playbook run recording run of slash command")
+		return "", errors.Wrapf(err, "플레이북 Run의 슬래시 커맨드 기록을 업데이트 하지 못했습니다")
 	}
 
 	s.telemetry.RunTaskSlashCommand(playbookRunID, userID, itemToRun)
@@ -1762,7 +1762,7 @@ func (s *PlaybookRunServiceImpl) RunChecklistItemSlashCommand(playbookRunID, use
 		CreateAt:      eventTime,
 		EventAt:       eventTime,
 		EventType:     RanSlashCommand,
-		Summary:       fmt.Sprintf("ran the slash command: `%s`", command),
+		Summary:       fmt.Sprintf("슬래시 커맨드 실행 됨: `%s`", command),
 		SubjectUserID: userID,
 	}
 
@@ -1780,7 +1780,7 @@ func (s *PlaybookRunServiceImpl) DuplicateChecklistItem(playbookRunID, userID st
 	}
 
 	if !IsValidChecklistItemIndex(playbookRunToModify.Checklists, checklistNumber, itemNumber) {
-		return errors.New("invalid checklist item indicies")
+		return errors.New("유효하지 않은 체크리스트 항목 인덱스")
 	}
 
 	checklistItem := playbookRunToModify.Checklists[checklistNumber].Items[itemNumber]
@@ -2054,7 +2054,7 @@ func (s *PlaybookRunServiceImpl) MoveChecklist(playbookRunID, userID string, sou
 	}
 
 	if destChecklistIdx < 0 || destChecklistIdx >= len(playbookRunToModify.Checklists) {
-		return errors.New("invalid destChecklist")
+		return errors.New("유효하지 않은 destChecklist")
 	}
 
 	// Get checklist to move
@@ -2087,12 +2087,12 @@ func (s *PlaybookRunServiceImpl) MoveChecklistItem(playbookRunID, userID string,
 	}
 
 	if destChecklistIdx < 0 || destChecklistIdx >= len(playbookRunToModify.Checklists) {
-		return errors.New("invalid destChecklist")
+		return errors.New("유효하지 않은 destChecklist")
 	}
 
 	lenDestItems := len(playbookRunToModify.Checklists[destChecklistIdx].Items)
 	if (destItemIdx < 0) || (sourceChecklistIdx == destChecklistIdx && destItemIdx >= lenDestItems) || (destItemIdx > lenDestItems) {
-		return errors.New("invalid destItem")
+		return errors.New("유효하지 않은 destItem")
 	}
 
 	// Moved item
@@ -2329,7 +2329,7 @@ func (s *PlaybookRunServiceImpl) checklistParamsVerify(playbookRunID, userID str
 	}
 
 	if checklistNumber < 0 || checklistNumber >= len(playbookRunToModify.Checklists) {
-		return nil, errors.New("invalid checklist number")
+		return nil, errors.New("유효하지 않은 체크리스트 번호")
 	}
 
 	return playbookRunToModify, nil
@@ -2342,7 +2342,7 @@ func (s *PlaybookRunServiceImpl) checklistItemParamsVerify(playbookRunID, userID
 	}
 
 	if itemNumber < 0 || itemNumber >= len(playbookRunToModify.Checklists[checklistNumber].Items) {
-		return nil, errors.New("invalid item number")
+		return nil, errors.New("유효하지 않은 항목 번호")
 	}
 
 	return playbookRunToModify, nil
@@ -2397,7 +2397,7 @@ func (s *PlaybookRunServiceImpl) createPlaybookRunChannel(playbookRun *PlaybookR
 		}
 
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create channel")
+			return nil, errors.Wrapf(err, "채널 생성에 실패했습니다")
 		}
 	}
 
@@ -2407,21 +2407,21 @@ func (s *PlaybookRunServiceImpl) createPlaybookRunChannel(playbookRun *PlaybookR
 // addPlaybookRunInitialMemberships creates the memberships in run and channels for the most core users: playbooksbot, reporter and owner
 func (s *PlaybookRunServiceImpl) addPlaybookRunInitialMemberships(playbookRun *PlaybookRun, channel *model.Channel) error {
 	if _, err := s.api.CreateMember(channel.TeamId, s.configService.GetConfiguration().BotUserID); err != nil {
-		return errors.Wrapf(err, "failed to add bot to the team")
+		return errors.Wrapf(err, "팀에 봇 추가를 실패했습니다")
 	}
 
 	// channel related
 	if _, err := s.api.AddMemberToChannel(channel.Id, s.configService.GetConfiguration().BotUserID); err != nil {
-		return errors.Wrapf(err, "failed to add bot to the channel")
+		return errors.Wrapf(err, "채널에 봇 추가를 실패했습니다")
 	}
 
 	if _, err := s.api.AddUserToChannel(channel.Id, playbookRun.ReporterUserID, s.configService.GetConfiguration().BotUserID); err != nil {
-		return errors.Wrapf(err, "failed to add reporter to the channel")
+		return errors.Wrapf(err, "채널에 리포터 추가를 실패했습니다")
 	}
 
 	if playbookRun.OwnerUserID != playbookRun.ReporterUserID {
 		if _, err := s.api.AddUserToChannel(channel.Id, playbookRun.OwnerUserID, s.configService.GetConfiguration().BotUserID); err != nil {
-			return errors.Wrapf(err, "failed to add owner to channel")
+			return errors.Wrapf(err, "채널에 오너 추가를 실패했습니다")
 		}
 	}
 
@@ -2430,7 +2430,7 @@ func (s *PlaybookRunServiceImpl) addPlaybookRunInitialMemberships(playbookRun *P
 		logrus.WithError(err).WithFields(logrus.Fields{
 			"channel_id":    channel.Id,
 			"owner_user_id": playbookRun.OwnerUserID,
-		}).Warn("failed to promote owner to admin")
+		}).Warn("오너를 관리자로 승격에 실패했습니다")
 	}
 
 	// run related
@@ -2440,7 +2440,7 @@ func (s *PlaybookRunServiceImpl) addPlaybookRunInitialMemberships(playbookRun *P
 	}
 	err := s.AddParticipants(playbookRun.ID, participants, playbookRun.ReporterUserID, false)
 	if err != nil {
-		return errors.Wrap(err, "failed to add owner/reporter as a participant")
+		return errors.Wrap(err, "참여자로 오너/리포터 추가에 실패했습니다")
 	}
 	return nil
 }
@@ -2480,7 +2480,7 @@ func (s *PlaybookRunServiceImpl) newFinishPlaybookRunDialog(playbookRun *Playboo
 func (s *PlaybookRunServiceImpl) newPlaybookRunDialog(teamID, requesterID, postID, clientID string, playbooks []Playbook) (*model.Dialog, error) {
 	user, err := s.api.GetUserByID(requesterID)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to fetch owner user")
+		return nil, errors.Wrapf(err, "오너 사용자 분석에 실패했습니다")
 	}
 
 	T := i18n.GetUserTranslations(user.Locale)
@@ -2490,7 +2490,7 @@ func (s *PlaybookRunServiceImpl) newPlaybookRunDialog(teamID, requesterID, postI
 		ClientID: clientID,
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal DialogState")
+		return nil, errors.Wrapf(err, "DialogState 마샬링에 실패했습니다")
 	}
 
 	var options []*model.PostActionOptions
@@ -2634,12 +2634,12 @@ func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(playbookRuns []PlaybookR
 		PostID: postID,
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal DialogState")
+		return nil, errors.Wrapf(err, "DialogState 마샬링에 실패했습니다")
 	}
 
 	post, err := s.api.GetPost(postID)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal DialogState")
+		return nil, errors.Wrapf(err, "DialogState 마샬링에 실패했습니다")
 	}
 	defaultSummary := ""
 	if post.Message != "" {
@@ -2652,7 +2652,7 @@ func (s *PlaybookRunServiceImpl) newAddToTimelineDialog(playbookRuns []PlaybookR
 
 	defaultPlaybookRuns, err := s.GetPlaybookRunsForChannelByUser(post.ChannelId, userID)
 	if err != nil && !errors.Is(err, ErrNotFound) {
-		return nil, errors.Wrapf(err, "failed to get playbookRunID for channel")
+		return nil, errors.Wrapf(err, "채널에 대한 playbookRunID를 가져올 수 없습니다")
 	}
 
 	defaultRunID := ""
@@ -2721,7 +2721,7 @@ func (s *PlaybookRunServiceImpl) sendPlaybookRunUpdatedWS(playbookRunID string, 
 	if playbookRun == nil {
 		playbookRun, err = s.store.GetPlaybookRun(playbookRunID)
 		if err != nil {
-			logrus.WithError(err).WithField("playbookRunID", playbookRunID).Error("failed to retrieve playbook run when sending websocket")
+			logrus.WithError(err).WithField("playbookRunID", playbookRunID).Error("웹소켓을 전송할 때 플레이북 Run을 찾지 못했습니다")
 			return
 		}
 	}
@@ -2785,7 +2785,7 @@ func (s *PlaybookRunServiceImpl) PublishRetrospective(playbookRunID, publisherID
 
 	publisherUser, err := s.api.GetUserByID(publisherID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get publisher user")
+		return errors.Wrap(err, "발행 사용자를 가져올 수 없습니다")
 	}
 
 	retrospectiveURL := getRunRetrospectiveURL("", playbookRunToPublish.ID)
@@ -2795,11 +2795,11 @@ func (s *PlaybookRunServiceImpl) PublishRetrospective(playbookRunID, publisherID
 	}
 
 	if err = s.poster.Post(post); err != nil {
-		return errors.Wrap(err, "failed to post to channel")
+		return errors.Wrap(err, "채널에 게시할 수 없습니다")
 	}
 
 	telemetryString := fmt.Sprintf("?telem_action=follower_clicked_retrospective_dm&telem_run_id=%s", playbookRunToPublish.ID)
-	retrospectivePublishedMessage := fmt.Sprintf("@%s published the retrospective report for [%s](%s%s).\n%s", publisherUser.Username, playbookRunToPublish.Name, retrospectiveURL, telemetryString, retrospective.Text)
+	retrospectivePublishedMessage := fmt.Sprintf("@%s이(가) 다음에 대한 회고 보고서를 발행했습니다 [%s](%s%s).\n%s", publisherUser.Username, playbookRunToPublish.Name, retrospectiveURL, telemetryString, retrospective.Text)
 	err = s.dmPostToRunFollowers(&model.Post{Message: retrospectivePublishedMessage}, retroMessage, playbookRunToPublish.ID, publisherID)
 	if err != nil {
 		logger.WithError(err).Error("Run 팔로워들에게 DM을 보낼 수 없습니다")
@@ -2834,24 +2834,24 @@ func (s *PlaybookRunServiceImpl) buildRetrospectivePost(playbookRunToPublish *Pl
 	if len(playbookRunToPublish.MetricsData) > 0 {
 		playbook, err := s.playbookService.Get(playbookRunToPublish.PlaybookID)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get playbook")
+			return nil, errors.Wrap(err, "플레이북을 가져올 수 없습니다")
 		}
 
 		metricsConfigs, err := json.Marshal(playbook.Metrics)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to marshal metrics configs")
+			return nil, errors.Wrap(err, "지표 설정을 마샬링 할 수 없습니다")
 		}
 
 		metricsData, err := json.Marshal(playbookRunToPublish.MetricsData)
 		if err != nil {
-			return nil, errors.Wrap(err, "cannot post retro, unable to marshal metrics data")
+			return nil, errors.Wrap(err, "회고 게시 실패, 지표 데이터 마샬링 불가")
 		}
 		props["metricsData"] = string(metricsData)
 		props["metricsConfigs"] = string(metricsConfigs)
 	}
 
 	return &model.Post{
-		Message:   fmt.Sprintf("@channel Retrospective for [%s](%s) has been published by @%s\n[See the full retrospective](%s)\n", playbookRunToPublish.Name, GetRunDetailsRelativeURL(playbookRunToPublish.ID), publisherUser.Username, retrospectiveURL),
+		Message:   fmt.Sprintf("[%s](%s)에 대한 @channel 회고가 @%s에 의해 발행되었습니다\n[전체 회고 보고서 보기](%s)\n", playbookRunToPublish.Name, GetRunDetailsRelativeURL(playbookRunToPublish.ID), publisherUser.Username, retrospectiveURL),
 		Type:      "custom_retro",
 		ChannelId: playbookRunToPublish.ChannelID,
 		Props:     props,
@@ -2867,7 +2867,7 @@ func (s *PlaybookRunServiceImpl) CancelRetrospective(playbookRunID, cancelerID s
 	now := model.GetMillis()
 
 	// Update the text to keep syncronized
-	playbookRunToCancel.Retrospective = "No retrospective for this run."
+	playbookRunToCancel.Retrospective = "이 Run에 대한 회고 보고서가 없습니다."
 	playbookRunToCancel.RetrospectivePublishedAt = now
 	playbookRunToCancel.RetrospectiveWasCanceled = true
 
@@ -2878,11 +2878,11 @@ func (s *PlaybookRunServiceImpl) CancelRetrospective(playbookRunID, cancelerID s
 
 	cancelerUser, err := s.api.GetUserByID(cancelerID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get canceler user")
+		return errors.Wrap(err, "취소한 사용자를 가져올 수 없습니다")
 	}
 
-	if _, err = s.poster.PostMessage(playbookRunToCancel.ChannelID, "@channel Retrospective for [%s](%s) has been canceled by @%s\n", playbookRunToCancel.Name, GetRunDetailsRelativeURL(playbookRunID), cancelerUser.Username); err != nil {
-		return errors.Wrap(err, "failed to post to channel")
+	if _, err = s.poster.PostMessage(playbookRunToCancel.ChannelID, "[%s](%s)에 대한 @channel 회고 보고서가 @%s에 의해 취소되었습니다\n", playbookRunToCancel.Name, GetRunDetailsRelativeURL(playbookRunID), cancelerUser.Username); err != nil {
+		return errors.Wrap(err, "채널에 게시할 수 없습니다")
 	}
 
 	event := &TimelineEvent{
@@ -2911,12 +2911,12 @@ func (s *PlaybookRunServiceImpl) RequestJoinChannel(playbookRunID, requesterID s
 
 	// avoid sending request if user is already a member of the channel
 	if s.api.HasPermissionToChannel(requesterID, playbookRun.ChannelID, model.PermissionReadChannel) {
-		return fmt.Errorf("user %s is already a member of the channel %s", requesterID, playbookRunID)
+		return fmt.Errorf("사용자 %s은(는) 이미 채널 %s의 멤버입니다", requesterID, playbookRunID)
 	}
 
 	requesterUser, err := s.api.GetUserByID(requesterID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get requester user")
+		return errors.Wrap(err, "요청 사용자를 가져올 수 없습니다")
 	}
 
 	T := i18n.GetUserTranslations(requesterUser.Locale)
@@ -2926,7 +2926,7 @@ func (s *PlaybookRunServiceImpl) RequestJoinChannel(playbookRunID, requesterID s
 
 	_, err = s.poster.PostMessage(playbookRun.ChannelID, T("app.user.run.request_join_channel", data))
 	if err != nil {
-		return errors.Wrap(err, "failed to post to channel")
+		return errors.Wrap(err, "채널에 게시할 수 없습니다")
 	}
 	return nil
 }
@@ -2940,7 +2940,7 @@ func (s *PlaybookRunServiceImpl) RequestUpdate(playbookRunID, requesterID string
 
 	requesterUser, err := s.api.GetUserByID(requesterID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get requester user")
+		return errors.Wrap(err, "요청 사용자를 가져올 수 없습니다")
 	}
 
 	T := i18n.GetUserTranslations(requesterUser.Locale)
@@ -2952,7 +2952,7 @@ func (s *PlaybookRunServiceImpl) RequestUpdate(playbookRunID, requesterID string
 
 	post, err := s.poster.PostMessage(playbookRun.ChannelID, T("app.user.run.request_update", data))
 	if err != nil {
-		return errors.Wrap(err, "failed to post to channel")
+		return errors.Wrap(err, "채널에 게시할 수 없습니다")
 	}
 
 	// create timeline event
@@ -2964,7 +2964,7 @@ func (s *PlaybookRunServiceImpl) RequestUpdate(playbookRunID, requesterID string
 		PostID:        post.Id,
 		SubjectUserID: requesterID,
 		CreatorUserID: requesterID,
-		Summary:       fmt.Sprintf("@%s requested a status update", requesterUser.Username),
+		Summary:       fmt.Sprintf("@%s이(가) 상태 업데이트를 요청했습니다", requesterUser.Username),
 	}
 
 	if _, err = s.store.CreateTimelineEvent(event); err != nil {
@@ -2991,17 +2991,17 @@ func (s *PlaybookRunServiceImpl) RemoveParticipants(playbookRunID string, userID
 	// Check if any user is the owner
 	for _, userID := range userIDs {
 		if playbookRun.OwnerUserID == userID {
-			return errors.New("owner user can't leave the run")
+			return errors.New("오너 사용자는 Run을 나갈 수 없습니다")
 		}
 	}
 
 	if err = s.store.RemoveParticipants(playbookRunID, userIDs); err != nil {
-		return errors.Wrapf(err, "users `%+v` failed to remove participation in run `%s`", userIDs, playbookRunID)
+		return errors.Wrapf(err, "사용자 `%+v`의 `%s` Run에 대한 참여를 제거하지 못했습니다", userIDs, playbookRunID)
 	}
 
 	requesterUser, err := s.api.GetUserByID(requesterUserID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get requester user")
+		return errors.Wrap(err, "요청 사용자를 가져오지 못했습니다")
 	}
 
 	users := make([]*model.User, 0)
@@ -3010,7 +3010,7 @@ func (s *PlaybookRunServiceImpl) RemoveParticipants(playbookRunID string, userID
 		if userID != requesterUserID {
 			user, err = s.api.GetUserByID(userID)
 			if err != nil {
-				return errors.Wrap(err, "failed to get user")
+				return errors.Wrap(err, "사용자를 가져오지 못했습니다")
 			}
 		}
 		users = append(users, user)
@@ -3043,7 +3043,7 @@ func (s *PlaybookRunServiceImpl) leaveActions(playbookRun *PlaybookRun, userID s
 
 	// To be added to the UI as an optional action
 	if err := s.api.DeleteChannelMember(playbookRun.ChannelID, userID); err != nil {
-		logrus.WithError(err).WithField("user_id", userID).Error("failed to remove user from linked channel")
+		logrus.WithError(err).WithField("user_id", userID).Error("연결된 채널에서 사용자를 제거할 수 없습니다")
 	}
 }
 
@@ -3057,7 +3057,7 @@ func (s *PlaybookRunServiceImpl) AddParticipants(playbookRunID string, userIDs [
 
 	playbookRun, err := s.GetPlaybookRun(playbookRunID)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get run %s", playbookRunID)
+		return errors.Wrapf(err, "Run %s을(를) 가져올 수 없습니다", playbookRunID)
 	}
 
 	// Ensure new participants are team members
@@ -3072,19 +3072,19 @@ func (s *PlaybookRunServiceImpl) AddParticipants(playbookRunID string, userIDs [
 	}
 
 	if err = s.store.AddParticipants(playbookRun.ID, usersToInvite); err != nil {
-		return errors.Wrapf(err, "users `%+v` failed to participate the run `%s`", usersToInvite, playbookRun.ID)
+		return errors.Wrapf(err, "사용자 `%+v`이(가) Run `%s`에 참여할 수 없습니다", usersToInvite, playbookRun.ID)
 	}
 
 	channel, err := s.api.GetChannelByID(playbookRun.ChannelID)
 	if err != nil {
-		logrus.WithError(err).WithField("channel_id", playbookRun.ChannelID).Error("failed to get channel")
+		logrus.WithError(err).WithField("channel_id", playbookRun.ChannelID).Error("채널을 가져올 수 없습니다")
 	}
 
 	s.failedInvitedUserActions(usersFailedToInvite, channel)
 
 	requesterUser, err := s.api.GetUserByID(requesterUserID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get requester user")
+		return errors.Wrap(err, "요청 사용자를 가져올 수 없습니다")
 	}
 
 	users := make([]*model.User, 0)
@@ -3093,7 +3093,7 @@ func (s *PlaybookRunServiceImpl) AddParticipants(playbookRunID string, userIDs [
 		if userID != requesterUserID {
 			user, err = s.api.GetUserByID(userID)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get user %s", userID)
+				return errors.Wrapf(err, "사용자 %s을(를) 가져올 수 없습니다", userID)
 			}
 		}
 		users = append(users, user)
@@ -3103,7 +3103,7 @@ func (s *PlaybookRunServiceImpl) AddParticipants(playbookRunID string, userIDs [
 
 		// Participate implies following the run
 		if err = s.Follow(playbookRunID, userID); err != nil {
-			return errors.Wrap(err, "failed to make participant to follow run")
+			return errors.Wrap(err, "참여자가 Run을 팔로우하도록 하지 못했습니다")
 		}
 	}
 
@@ -3160,7 +3160,7 @@ func (s *PlaybookRunServiceImpl) changeParticipantsTimeline(playbookRunID string
 	}
 	detailsJSON, err := json.Marshal(details)
 	if err != nil {
-		return errors.Wrap(err, "failed to encode timeline event details")
+		return errors.Wrap(err, "타임라인 이벤트 상세사항을 인코딩하지 못했습니다")
 	}
 	event.Details = string(detailsJSON)
 
@@ -3185,19 +3185,19 @@ func (s *PlaybookRunServiceImpl) participateActions(playbookRun *PlaybookRun, ch
 
 	// Add user to the channel
 	if _, err := s.api.AddChannelMember(playbookRun.ChannelID, user.Id); err != nil {
-		logrus.WithError(err).WithField("user_id", user.Id).Error("participateActions: failed to add user to linked channel")
+		logrus.WithError(err).WithField("user_id", user.Id).Error("participateActions: 연결된 채널에 사용자를 추가하지 못했습니다")
 	}
 }
 
 func (s *PlaybookRunServiceImpl) postMessageToThreadAndSaveRootID(playbookRunID, channelID string, post *model.Post) error {
 	channelIDsToRootIDs, err := s.store.GetBroadcastChannelIDsToRootIDs(playbookRunID)
 	if err != nil {
-		return errors.Wrapf(err, "error when trying to retrieve ChannelIDsToRootIDs map for playbookRunId '%s'", playbookRunID)
+		return errors.Wrapf(err, "playbookRunId '%s'에 대한 ChannelIDsToRootIDs 맵 검색 시 오류가 발생했습니다", playbookRunID)
 	}
 
 	err = s.poster.PostMessageToThread(channelIDsToRootIDs[channelID], post)
 	if err != nil {
-		return errors.Wrapf(err, "failed to PostMessageToThread for channelID '%s'", channelID)
+		return errors.Wrapf(err, "channelID '%s'에 대한 PostMessageToThread 실패입니다", channelID)
 	}
 
 	newRootID := post.RootId
@@ -3208,7 +3208,7 @@ func (s *PlaybookRunServiceImpl) postMessageToThreadAndSaveRootID(playbookRunID,
 	if newRootID != channelIDsToRootIDs[channelID] {
 		channelIDsToRootIDs[channelID] = newRootID
 		if err = s.store.SetBroadcastChannelIDsToRootID(playbookRunID, channelIDsToRootIDs); err != nil {
-			return errors.Wrapf(err, "failed to SetBroadcastChannelIDsToRootID for playbookID '%s'", playbookRunID)
+			return errors.Wrapf(err, "playbookID '%s'에 대한 SetBroadcastChannelIDsToRootID 실패입니다", playbookRunID)
 		}
 	}
 
@@ -3218,7 +3218,7 @@ func (s *PlaybookRunServiceImpl) postMessageToThreadAndSaveRootID(playbookRunID,
 // Follow method lets user follow a specific playbook run
 func (s *PlaybookRunServiceImpl) Follow(playbookRunID, userID string) error {
 	if err := s.store.Follow(playbookRunID, userID); err != nil {
-		return errors.Wrapf(err, "user `%s` failed to follow the run `%s`", userID, playbookRunID)
+		return errors.Wrapf(err, "사용자 `%s`이(가) Run `%s`을(를) 팔로우하지 못했습니다", userID, playbookRunID)
 	}
 
 	playbookRun, err := s.store.GetPlaybookRun(playbookRunID)
@@ -3234,7 +3234,7 @@ func (s *PlaybookRunServiceImpl) Follow(playbookRunID, userID string) error {
 // UnFollow method lets user unfollow a specific playbook run
 func (s *PlaybookRunServiceImpl) Unfollow(playbookRunID, userID string) error {
 	if err := s.store.Unfollow(playbookRunID, userID); err != nil {
-		return errors.Wrapf(err, "user `%s` failed to unfollow the run `%s`", userID, playbookRunID)
+		return errors.Wrapf(err, "사용자 `%s`이(가) Run `%s`을(를) 언팔로우하지 못했습니다", userID, playbookRunID)
 	}
 
 	playbookRun, err := s.store.GetPlaybookRun(playbookRunID)
@@ -3253,7 +3253,7 @@ func (s *PlaybookRunServiceImpl) GetFollowers(playbookRunID string) ([]string, e
 	var followers []string
 	var err error
 	if followers, err = s.store.GetFollowers(playbookRunID); err != nil {
-		return nil, errors.Wrapf(err, "failed to get followers for the run `%s`", playbookRunID)
+		return nil, errors.Wrapf(err, "Run `%s`의 팔로워 정보를 가져오지 못했습니다", playbookRunID)
 	}
 
 	return followers, nil
@@ -3330,7 +3330,7 @@ func triggerWebhooks(s *PlaybookRunServiceImpl, webhooks []string, body []byte) 
 			req, err := http.NewRequest("POST", url, bytes.NewReader(body))
 
 			if err != nil {
-				logrus.WithError(err).WithField("webhook_url", url).Error("failed to create a POST request to webhook URL")
+				logrus.WithError(err).WithField("webhook_url", url).Error("웹훅 URL에 대한 POST 요청을 생성하지 못했습니다")
 				return
 			}
 
@@ -3338,15 +3338,15 @@ func triggerWebhooks(s *PlaybookRunServiceImpl, webhooks []string, body []byte) 
 
 			resp, err := s.httpClient.Do(req)
 			if err != nil {
-				logrus.WithError(err).WithField("webhook_url", url).Warn("failed to send a POST request to webhook URL")
+				logrus.WithError(err).WithField("webhook_url", url).Warn("웹훅 URL에 대한 POST 요청을 보내지 못했습니다")
 				return
 			}
 
 			defer resp.Body.Close()
 
 			if resp.StatusCode < 200 || resp.StatusCode > 299 {
-				err := errors.Errorf("response code is %d; expected a status code in the 2xx range", resp.StatusCode)
-				logrus.WithError(err).WithField("webhook_url", url).Warn("failed to finish a POST request to webhook URL")
+				err := errors.Errorf("응답 코드 %d; 2xx 범위의 상태 코드가 예상됨", resp.StatusCode)
+				logrus.WithError(err).WithField("webhook_url", url).Warn("웹훅 URL에 대한 POST 요청을 끝내지 못했습니다")
 			}
 		}()
 	}
@@ -3506,8 +3506,8 @@ func (s *PlaybookRunServiceImpl) broadcastPlaybookRunMessageToChannels(channelID
 		if err := s.broadcastPlaybookRunMessage(broadcastChannelID, post, mType, playbookRun); err != nil {
 			logger.WithError(err).Error("failed to broadcast run to channel")
 
-			if _, err = s.poster.PostMessage(playbookRun.ChannelID, fmt.Sprintf("Failed to broadcast run %s to the configured channel.", mType)); err != nil {
-				logger.WithError(err).WithField("channel_id", playbookRun.ChannelID).Error("failed to post failure message to the channel")
+			if _, err = s.poster.PostMessage(playbookRun.ChannelID, fmt.Sprintf("설정된 채널로 Run %s를 브로캐스트 하지 못했습니다.", mType)); err != nil {
+				logger.WithError(err).WithField("channel_id", playbookRun.ChannelID).Error("채널에 실패 메시지를 게시하지 못했습니다")
 			}
 		}
 	}
@@ -3516,11 +3516,11 @@ func (s *PlaybookRunServiceImpl) broadcastPlaybookRunMessageToChannels(channelID
 func (s *PlaybookRunServiceImpl) broadcastPlaybookRunMessage(broadcastChannelID string, post *model.Post, mType messageType, playbookRun *PlaybookRun) error {
 	post.ChannelId = broadcastChannelID
 	if err := IsChannelActiveInTeam(post.ChannelId, playbookRun.TeamID, s.api); err != nil {
-		return errors.Wrap(err, "announcement channel is not active")
+		return errors.Wrap(err, "공지(announcement) 채널이 활성화되어 있지 않습니다")
 	}
 
 	if err := s.postMessageToThreadAndSaveRootID(playbookRun.ID, post.ChannelId, post); err != nil {
-		return errors.Wrapf(err, "error posting '%s' message, for playbook '%s', to channelID '%s'", mType, playbookRun.ID, post.ChannelId)
+		return errors.Wrapf(err, "오류 게시 '%s' 메시지, 대상 플레이북 '%s', 대상 채널ID '%s'", mType, playbookRun.ID, post.ChannelId)
 	}
 
 	return nil
@@ -3531,7 +3531,7 @@ func (s *PlaybookRunServiceImpl) broadcastPlaybookRunMessage(broadcastChannelID 
 func (s *PlaybookRunServiceImpl) dmPostToRunFollowers(post *model.Post, mType messageType, playbookRunID, authorID string) error {
 	followers, err := s.GetFollowers(playbookRunID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get followers")
+		return errors.Wrap(err, "팔로워를 가져오지 못했습니다")
 	}
 
 	s.dmPostToUsersWithPermission(followers, post, playbookRunID, authorID)
@@ -3541,7 +3541,7 @@ func (s *PlaybookRunServiceImpl) dmPostToRunFollowers(post *model.Post, mType me
 func (s *PlaybookRunServiceImpl) dmPostToAutoFollows(post *model.Post, playbookID, playbookRunID, authorID string) error {
 	autoFollows, err := s.playbookService.GetAutoFollows(playbookID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get auto follows")
+		return errors.Wrap(err, "자동 팔로워를 가져오지 못했습니다")
 	}
 
 	s.dmPostToUsersWithPermission(autoFollows, post, playbookRunID, authorID)
@@ -3565,7 +3565,7 @@ func (s *PlaybookRunServiceImpl) dmPostToUsersWithPermission(users []string, pos
 		post.Id = "" // Reset the ID so we avoid cloning the whole object
 		post.RootId = ""
 		if err := s.poster.DM(user, post); err != nil {
-			logger.WithError(err).WithField("user_id", user).Warn("failed to broadcast post to the user")
+			logger.WithError(err).WithField("user_id", user).Warn("사용자에게 게시글을 브로드캐스트 하지 못했습니다")
 		}
 	}
 }
@@ -3579,7 +3579,7 @@ func (s *PlaybookRunServiceImpl) MessageHasBeenPosted(post *model.Post) {
 		logrus.WithError(err).WithFields(logrus.Fields{
 			"post_id":    post.Id,
 			"channel_id": post.ChannelId,
-		}).Error("unable retrieve run ID from post")
+		}).Error("게시글로부터 Run ID를 확인할 수 없습니다")
 		return
 	}
 
@@ -3589,7 +3589,7 @@ func (s *PlaybookRunServiceImpl) MessageHasBeenPosted(post *model.Post) {
 		if err != nil {
 			logrus.WithError(err).WithFields(logrus.Fields{
 				"run_id": runID,
-			}).Error("unable retrieve run from ID")
+			}).Error("ID로 Run을 확인할 수 없습니다")
 			return
 		}
 
@@ -3603,7 +3603,7 @@ func (s *PlaybookRunServiceImpl) MessageHasBeenPosted(post *model.Post) {
 								"type":         ta.Trigger.Type,
 								"checklistNum": checklistNum,
 								"itemNum":      itemNum,
-							}).Error("unable to decode trigger")
+							}).Error("트리거를 디코딩할 수 없습니다")
 							return
 						}
 						if t.IsTriggered(post) {
@@ -3619,7 +3619,7 @@ func (s *PlaybookRunServiceImpl) MessageHasBeenPosted(post *model.Post) {
 								logrus.WithError(err).WithFields(logrus.Fields{
 									"checklistNum": checklistNum,
 									"itemNum":      itemNum,
-								}).Error("can't process task actions")
+								}).Error("Task 액션을 처리할 수 없습니다")
 								return
 							}
 						}
@@ -3635,11 +3635,11 @@ func (s *PlaybookRunServiceImpl) doActions(taskActions []Action, runID string, u
 		if action.Type == MarkItemAsDoneActionType {
 			a, err := NewMarkItemAsDoneAction(action)
 			if err != nil {
-				return errors.Wrapf(err, "unable to decode action")
+				return errors.Wrapf(err, "액션을 디코딩할 수 없습니다")
 			}
 			if a.Payload.Enabled {
 				if err := s.ModifyCheckedState(runID, userID, ChecklistItemStateClosed, checklistNum, itemNum); err != nil {
-					return errors.Wrapf(err, "can't mark item as done")
+					return errors.Wrapf(err, "항목을 완료로 표시할 수 없습니다")
 				}
 			}
 		}

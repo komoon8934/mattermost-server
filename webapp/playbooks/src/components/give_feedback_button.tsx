@@ -26,7 +26,9 @@ const GiveFeedbackButton = ({className, tooltipPlacement}: Props) => {
         </Tooltip>
     );
 
+    // 수정됨 - FeedbackURL 수정 시 컴파일 오류로 원복, 2023.7.12
     const giveFeedbackURL = new URL('https://mattermost.com/pl/playbooks-feedback');
+    // const giveFeedbackURL = new URL('https://docs.google.com/forms/d/e/1FAIpQLSdQPn3PgfMb8geym2V93i7jza4nIkNU3KEV6Lgk6Ap9NNGp3A/viewform?usp=sf_link');
     const searchParams = giveFeedbackURL.searchParams;
 
     // Set the 'Server Version' field on the linked Google Form. (If we move to a different

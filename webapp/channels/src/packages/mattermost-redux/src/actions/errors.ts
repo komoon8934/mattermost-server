@@ -62,7 +62,7 @@ export function logError(error: ServerError, displayable = false, consoleError =
         }
 
         if (consoleError) {
-            serializedError.message = 'A JavaScript error has occurred. Please use the JavaScript console to capture and report the error';
+            serializedError.message = 'JavaScript 오류가 발생했습니다. 오류 보고용 데이터 획득은 브라우저의 JavaScript 콘솔을 사용할 수 있습니다';
         }
 
         const isDevMode = getState()?.entities.general?.config?.EnableDeveloper === 'true';

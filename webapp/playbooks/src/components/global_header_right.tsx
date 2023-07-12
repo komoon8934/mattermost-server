@@ -7,7 +7,7 @@ import {useIntl} from 'react-intl';
 import {useDispatch, useSelector} from 'react-redux';
 import styled, {css} from 'styled-components';
 import {CheckboxMultipleMarkedOutlineIcon} from '@mattermost/compass-icons/components';
-
+// 수정됨-피드백 버튼 제거
 //import GiveFeedbackButton from 'src/components/give_feedback_button';
 import {closeBackstageRHS, openBackstageRHS} from 'src/actions';
 import {BackstageRHSSection, BackstageRHSViewMode} from 'src/types/backstage_rhs';

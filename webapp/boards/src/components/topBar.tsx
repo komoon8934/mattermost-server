@@ -15,7 +15,8 @@ const TopBar = (): JSX.Element => {
         <div
             className='TopBar'
         >
-            {/* <a
+            {/* 수정됨-보드 피드백 버튼 제거
+            <a
                 className='link'
                 href={feedbackUrl}
                 target='_blank'
