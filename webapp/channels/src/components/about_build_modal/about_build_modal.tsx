@@ -82,6 +82,8 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
 
         let learnMore = (
             <div>
+                {/* 수정됨-커뮤니티 가입링크 삭제, 2023.7.13 
+
                 <FormattedMessage
                     id='about.teamEditionLearn'
                     defaultMessage='Join the Mattermost community at '
@@ -91,7 +93,8 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
                     href='https://mattermost.com/community/'
                 >
                     {'mattermost.com/community/'}
-                </ExternalLink>
+                </ExternalLink> 
+                */}
             </div>
         );
 
