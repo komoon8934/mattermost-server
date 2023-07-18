@@ -238,10 +238,18 @@ const RHSRunList = (props: Props) => {
                                 <StyledLoadingSpinner/>
                             }
                         </RunsList>
+<<<<<<< HEAD
                         {/* 수정됨-피드백 버튼 제거, 2023.7.11
                         <FeedbackWrapper>
                             <StyledGiveFeedbackButton tooltipPlacement='top'/>
                         </FeedbackWrapper> */}
+=======
+                        {/* 2023-06-22 commented by komoon
+                        <FeedbackWrapper>
+                            <StyledGiveFeedbackButton tooltipPlacement='top'/>
+                        </FeedbackWrapper> 
+                        */}
+>>>>>>> KAL-Internal
                     </Scrollbars>
                 }
             </Container>

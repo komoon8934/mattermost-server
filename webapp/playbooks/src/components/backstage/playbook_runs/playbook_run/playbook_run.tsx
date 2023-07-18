@@ -249,6 +249,7 @@ const PlaybookRunDetails = () => {
                             playbookRun={playbookRun}
                             role={role}
                         />
+                        {/* 2023-06-21 commented by komoon, Enterprise 기능 제한에 따른 주석 처리
                         <Retrospective
                             id={PlaybookRunIDs.SectionRetrospective}
                             playbookRun={playbookRun}
@@ -256,6 +257,7 @@ const PlaybookRunDetails = () => {
                             role={role}
                             focusMetricId={retrospectiveMetricId}
                         />
+                        */}
                         {role === Role.Participant ? <FinishRun playbookRun={playbookRun}/> : null}
                     </Body>
                 </Main>
