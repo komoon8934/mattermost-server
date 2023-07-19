@@ -117,7 +117,7 @@ const ViewTitle = (props: Props) => {
                 <div className='description'>
                     <MarkdownEditor
                         text={board.description}
-                        placeholderText='Add a description...'
+                        placeholderText='여기에 내용을 추가하세요...'
                         onBlur={onDescriptionBlur}
                         readonly={readonly}
                     />

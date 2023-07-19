@@ -265,9 +265,9 @@ export default class CommandProvider extends Provider {
                 if (this.shouldAddExecuteItem(data, pretext)) {
                     matches.unshift({
                         Complete: pretext + EXECUTE_CURRENT_COMMAND_ITEM_ID,
-                        Suggestion: '/Execute Current Command',
+                        Suggestion: '/현재 명령 실행',
                         Hint: '',
-                        Description: 'Select this option or use ' + cmd + '+Enter to execute the current command.',
+                        Description: '이 옵션을 클릭해서 선택하거나' + cmd + '+Enter를 사용해서 실행하세요.',
                         IconData: EXECUTE_CURRENT_COMMAND_ITEM_ID,
                         type: Constants.Integrations.COMMAND,
                     });

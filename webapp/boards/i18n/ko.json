@@ -332,7 +332,7 @@
     "ViewHeader.export-csv": "CSV로 내보내기",
     "ViewHeader.export-failed": "내보내기에 실패했습니다!",
     "ViewHeader.filter": "필터",
-    "ViewHeader.group-by": "{property}로 그룹화",
+    "ViewHeader.group-by": "{property}(으)로 그룹화",
     "ViewHeader.new": "신규",
     "ViewHeader.properties": "속성",
     "ViewHeader.properties-menu": "속성 메뉴",
